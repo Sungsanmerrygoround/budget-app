@@ -562,6 +562,7 @@
       </div>
       <div class="form-row">
         <input type="number" id="amount" placeholder="금액 (원)" inputmode="numeric">
+        <input type="date" id="entryDate">
       </div>
       <button class="btn-add" onclick="addEntry()">추가하기</button>
     </div>
@@ -813,15 +814,36 @@
     const desc = document.getElementById('desc').value.trim();
     const amount = parseInt(document.getElementById('amount').value);
     if (!desc || !amount || amount <= 0) { alert('내용과 금액을 입력해주세요!'); return; }
-    const d = new Date();
-    const date = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+    // 날짜 처리: 선택한 날짜 or 오늘
+    const dateVal = document.getElementById('entryDate').value;
+    let date;
+    if (dateVal) {
+      const [, mm, dd] = dateVal.split('-');
+      const now = new Date();
+      date = `${parseInt(mm)}/${parseInt(dd)} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+    } else {
+      const d = new Date();
+      date = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
     cachedEntries.push({ category, desc, amount, date });
     await saveData();
     render();
     document.getElementById('desc').value = '';
     document.getElementById('amount').value = '';
+    // 날짜는 오늘로 리셋
+    setTodayDate();
   }
   window.addEntry = addEntry;
+
+  function setTodayDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth()+1).padStart(2,'0');
+    const dd = String(today.getDate()).padStart(2,'0');
+    document.getElementById('entryDate').value = `${yyyy}-${mm}-${dd}`;
+  }
 
   function switchView(view) {
     activeView = view;
@@ -939,6 +961,7 @@
   window.closeModalDirect = closeModalDirect;
 
   buildMonthTabs();
+  setTodayDate();
   loadData();
 </script>
 </body>
