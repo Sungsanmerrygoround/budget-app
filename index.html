@@ -2,178 +2,248 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>내 가계부</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
-
     :root {
-      --bg: #f7f8fc;
-      --surface: #ffffff;
-      --primary: #5b5ef4;
-      --primary-dark: #4345d4;
-      --income: #00c48c;
-      --expense: #ff6b6b;
-      --balance: #5b5ef4;
-      --text: #1a1a2e;
-      --sub: #8888aa;
-      --border: #ebebf5;
-      --radius: 16px;
-      --shadow: 0 4px 20px rgba(91,94,244,0.08);
+      --bg: #0d0d0f;
+      --surface: #18181c;
+      --surface2: #222228;
+      --border: rgba(255,255,255,0.07);
+      --primary: #60a5fa;
+      --primary-dim: rgba(96,165,250,0.12);
+      --red: #ff5c5c;
+      --red-dim: rgba(255,92,92,0.12);
+      --text: #f0f0f0;
+      --sub: #888;
+      --radius: 18px;
+      --serif: 'DM Serif Display', serif;
+      --sans: 'Outfit', sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
-      font-family: 'Pretendard', -apple-system, sans-serif;
+      font-family: var(--sans);
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      padding-bottom: 40px;
     }
 
     /* HEADER */
     header {
-      background: var(--primary);
-      background: linear-gradient(135deg, #5b5ef4 0%, #8b5cf6 100%);
-      color: white;
-      padding: 24px 20px 20px;
+      padding: 56px 22px 0;
+      background: var(--bg);
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 4px 24px rgba(91,94,244,0.25);
     }
     .header-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+      align-items: flex-start;
+      margin-bottom: 20px;
     }
-    .header-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-    .header-year { font-size: 13px; opacity: 0.75; }
+    .header-title {
+      font-family: var(--serif);
+      font-size: 30px;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .header-title span { color: var(--primary); }
+    .header-year {
+      font-size: 12px;
+      color: var(--sub);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      margin-top: 6px;
+    }
 
     /* MONTH TABS */
     .month-scroll {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       overflow-x: auto;
-      padding-bottom: 2px;
+      padding-bottom: 16px;
       scrollbar-width: none;
     }
     .month-scroll::-webkit-scrollbar { display: none; }
     .month-tab {
       flex-shrink: 0;
-      padding: 7px 16px;
+      padding: 6px 14px;
       border-radius: 20px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
+      font-family: var(--sans);
       cursor: pointer;
-      border: none;
-      background: rgba(255,255,255,0.18);
-      color: rgba(255,255,255,0.75);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--sub);
       transition: all 0.2s;
     }
     .month-tab.active {
-      background: white;
-      color: var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
     }
 
     /* SUMMARY */
     .summary {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
-      padding: 16px;
+      padding: 0 16px 12px;
     }
     .card {
       background: var(--surface);
       border-radius: var(--radius);
-      padding: 14px 12px;
-      text-align: center;
-      box-shadow: var(--shadow);
+      padding: 16px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
     }
-    .card .label { font-size: 11px; color: var(--sub); margin-bottom: 5px; font-weight: 500; }
-    .card .amount { font-size: 16px; font-weight: 700; letter-spacing: -0.5px; }
-    .income-color { color: var(--income); }
-    .expense-color { color: var(--expense); }
-    .balance-color { color: var(--balance); }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--primary);
+      opacity: 0.6;
+    }
+    .card.red-card::before { background: var(--red); }
+    .card .label {
+      font-size: 10px;
+      color: var(--sub);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .card .amount {
+      font-family: var(--serif);
+      font-size: 20px;
+      letter-spacing: -0.5px;
+    }
+    .expense-color { color: var(--red); }
+    .balance-color { color: var(--primary); }
 
     /* BUDGET BAR */
     .budget-bar-wrap {
-      margin: 0 16px 16px;
+      margin: 0 16px 12px;
       background: var(--surface);
       border-radius: var(--radius);
-      padding: 16px 18px;
-      box-shadow: var(--shadow);
+      padding: 18px;
+      border: 1px solid var(--border);
     }
     .budget-bar-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
+      align-items: baseline;
+      margin-bottom: 12px;
     }
-    .budget-bar-label { font-size: 13px; font-weight: 600; color: var(--sub); }
-    .budget-bar-remain { font-size: 18px; font-weight: 700; }
+    .budget-bar-label {
+      font-size: 10px;
+      color: var(--sub);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .budget-bar-remain {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--primary);
+    }
     .budget-bg {
-      background: var(--border);
-      border-radius: 6px;
-      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      height: 4px;
       overflow: hidden;
     }
     .budget-fill {
       height: 100%;
-      border-radius: 6px;
-      transition: width 0.5s ease, background 0.3s;
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(.4,0,.2,1), background 0.3s;
     }
     .budget-sub {
       display: flex;
       justify-content: space-between;
-      margin-top: 7px;
-      font-size: 12px;
+      margin-top: 8px;
+      font-size: 11px;
       color: var(--sub);
     }
     .budget-edit-row {
       display: flex;
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 14px;
     }
     .budget-input {
       flex: 1;
-      padding: 9px 12px;
-      border: 1.5px solid var(--border);
+      padding: 10px 13px;
+      border: 1px solid var(--border);
       border-radius: 10px;
       font-size: 14px;
-      font-family: inherit;
-      background: var(--bg);
+      font-family: var(--sans);
+      background: var(--surface2);
       color: var(--text);
       outline: none;
     }
     .budget-input:focus { border-color: var(--primary); }
     .btn-budget {
-      padding: 9px 16px;
+      padding: 10px 16px;
       background: var(--primary);
-      color: white;
+      color: #ffffff;
       border: none;
       border-radius: 10px;
       font-size: 13px;
       font-weight: 700;
-      font-family: inherit;
+      font-family: var(--sans);
       cursor: pointer;
       white-space: nowrap;
     }
 
-    /* SECTION */
-    .section {
-      margin: 0 16px 16px;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 10px;
+    /* VIEW TABS */
+    .view-tabs {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      margin: 0 16px 14px;
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+    .view-tab {
+      flex: 1;
+      padding: 9px 4px;
+      border-radius: 10px;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--sans);
+      cursor: pointer;
+      background: transparent;
+      color: var(--sub);
+      transition: all 0.2s;
+    }
+    .view-tab.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+
+    /* SECTION */
+    .section { margin: 0 16px 14px; }
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--sub);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
     }
 
     /* FORM */
@@ -181,85 +251,150 @@
       background: var(--surface);
       border-radius: var(--radius);
       padding: 18px;
-      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
     .form-row { display: flex; gap: 8px; margin-bottom: 10px; }
     select, input {
       width: 100%;
-      padding: 11px 13px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       font-size: 14px;
-      font-family: inherit;
-      background: var(--bg);
+      font-family: var(--sans);
+      background: var(--surface2);
       color: var(--text);
       outline: none;
       transition: border-color 0.2s;
+      -webkit-appearance: none;
     }
     select:focus, input:focus { border-color: var(--primary); }
     .btn-add {
       width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #5b5ef4, #8b5cf6);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
+      padding: 14px;
+      background: var(--primary);
+      color: #ffffff;
       font-weight: 700;
-      font-family: inherit;
+      font-family: var(--sans);
       cursor: pointer;
       margin-top: 4px;
-      transition: opacity 0.2s;
+      transition: opacity 0.15s, transform 0.1s;
     }
-    .btn-add:active { opacity: 0.85; }
+    .btn-add:active { opacity: 0.85; transform: scale(0.99); }
 
     /* CHART */
     .chart-card {
       background: var(--surface);
       border-radius: var(--radius);
       padding: 18px;
-      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
-    .chart-wrap {
-      position: relative;
-      height: 220px;
-      margin-top: 8px;
-    }
+    .chart-wrap { position: relative; height: 200px; margin-top: 10px; }
 
     /* CATEGORY LIST */
     .cat-list { display: flex; flex-direction: column; gap: 8px; }
     .cat-item {
       background: var(--surface);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 14px 16px;
-      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
       cursor: pointer;
-      border: 1.5px solid transparent;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: background 0.15s, border-color 0.15s;
     }
-    .cat-item:active { border-color: var(--primary); }
+    .cat-item:active { background: var(--surface2); border-color: var(--primary); }
     .cat-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
-    .cat-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-    .cat-total { font-size: 15px; font-weight: 700; color: var(--expense); }
-    .cat-bar-bg {
-      background: var(--border);
-      border-radius: 4px;
-      height: 5px;
+    .cat-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+    .cat-total { font-family: var(--serif); font-size: 16px; color: var(--red); }
+    .cat-bar-bg { background: rgba(255,255,255,0.06); border-radius: 3px; height: 3px; overflow: hidden; }
+    .cat-bar { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+
+    /* ENTRY LIST */
+    .entry-list { display: flex; flex-direction: column; gap: 8px; }
+    .entry-item {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .entry-item:active { background: var(--surface2); }
+    .entry-desc { font-size: 14px; font-weight: 500; }
+    .entry-meta { font-size: 11px; color: var(--sub); margin-top: 3px; }
+    .entry-amt-expense { font-family: var(--serif); font-size: 16px; color: var(--red); }
+
+    .empty { text-align: center; color: var(--sub); padding: 36px; font-size: 13px; }
+
+    /* CALENDAR */
+    .cal-wrap {
+      margin: 0 16px 14px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
       overflow: hidden;
     }
-    .cat-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #5b5ef4, #8b5cf6); transition: width 0.5s ease; }
+    .cal-dow {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid var(--border);
+    }
+    .cal-dow span {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 10px 0;
+      color: var(--sub);
+      letter-spacing: 0.05em;
+    }
+    .cal-dow span:first-child { color: var(--red); }
+    .cal-dow span:last-child { color: #6699ff; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .cal-cell {
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      min-height: 58px;
+      padding: 6px;
+      cursor: default;
+    }
+    .cal-cell:nth-child(7n) { border-right: none; }
+    .cal-cell.has-data { cursor: pointer; }
+    .cal-cell.has-data:active { background: var(--surface2); }
+    .cal-cell.today { background: var(--primary-dim); }
+    .cal-cell.empty { background: rgba(0,0,0,0.15); }
+    .cal-cell.selected-day { background: rgba(96,165,250,0.08); }
+    .cal-day { font-size: 12px; font-weight: 500; margin-bottom: 3px; color: var(--sub); }
+    .cal-cell.today .cal-day {
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 50%;
+      width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+    .cal-cell:nth-child(7n+1) .cal-day { color: var(--red); }
+    .cal-cell:nth-child(7n) .cal-day { color: #6699ff; }
+    .cal-amt { font-size: 10px; font-weight: 600; color: var(--primary); }
+    .day-detail { margin: 0 16px 14px; }
+    .day-detail-title {
+      font-family: var(--serif);
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
 
-    /* DETAIL MODAL */
+    /* MODALS */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
       z-index: 200;
       align-items: flex-end;
     }
@@ -267,30 +402,35 @@
     .modal {
       background: var(--surface);
       border-radius: 24px 24px 0 0;
-      padding: 24px 20px;
+      border-top: 1px solid var(--border);
+      padding: 24px 20px 48px;
       width: 100%;
       max-height: 75vh;
       overflow-y: auto;
-      animation: slideUp 0.28s ease;
+      animation: slideUp 0.28s cubic-bezier(.4,0,.2,1);
     }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .modal-handle {
-      width: 40px; height: 4px;
+      width: 36px; height: 3px;
       background: var(--border);
       border-radius: 2px;
-      margin: 0 auto 20px;
+      margin: 0 auto 22px;
     }
     .modal-title {
-      font-size: 17px; font-weight: 700;
-      margin-bottom: 16px;
+      font-family: var(--serif);
+      font-size: 18px;
+      margin-bottom: 18px;
       display: flex; justify-content: space-between; align-items: center;
     }
     .modal-close {
-      background: none; border: none;
-      font-size: 20px; cursor: pointer; color: var(--sub);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--sub);
+      display: flex; align-items: center; justify-content: center;
     }
     .detail-item {
       display: flex; justify-content: space-between; align-items: center;
@@ -299,16 +439,16 @@
     }
     .detail-item:last-child { border-bottom: none; }
     .detail-desc { font-size: 14px; font-weight: 500; }
-    .detail-meta { font-size: 12px; color: var(--sub); margin-top: 2px; }
-    .detail-amt { font-size: 15px; font-weight: 700; }
-    .empty { text-align: center; color: var(--sub); padding: 30px; font-size: 14px; }
+    .detail-meta { font-size: 11px; color: var(--sub); margin-top: 2px; }
+    .detail-amt { font-family: var(--serif); font-size: 16px; color: var(--red); }
 
     /* EDIT MODAL */
     .edit-modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
       z-index: 300;
       align-items: center;
       justify-content: center;
@@ -317,124 +457,71 @@
     .edit-modal-overlay.open { display: flex; }
     .edit-modal {
       background: var(--surface);
-      border-radius: 20px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
       padding: 24px 20px;
       width: 100%;
       max-width: 400px;
-      animation: fadeIn 0.2s ease;
+      animation: popIn 0.2s cubic-bezier(.4,0,.2,1);
     }
-    @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+    @keyframes popIn { from { opacity:0; transform:scale(0.94); } to { opacity:1; transform:scale(1); } }
     .edit-modal-title {
-      font-size: 17px; font-weight: 700;
-      margin-bottom: 18px;
+      font-family: var(--serif);
+      font-size: 18px;
+      margin-bottom: 20px;
       display: flex; justify-content: space-between; align-items: center;
     }
     .edit-field { margin-bottom: 12px; }
-    .edit-field label { font-size: 12px; font-weight: 600; color: var(--sub); display: block; margin-bottom: 5px; }
-    .edit-btn-row { display: flex; gap: 8px; margin-top: 16px; }
+    .edit-field label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--sub);
+      display: block;
+      margin-bottom: 6px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .edit-btn-row { display: flex; gap: 8px; margin-top: 18px; }
     .btn-delete {
       flex: 1; padding: 12px;
-      background: #fff0f0; color: var(--expense);
-      border: 1.5px solid #ffd0d0; border-radius: 10px;
-      font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer;
+      background: var(--red-dim);
+      color: var(--red);
+      border: 1px solid rgba(255,92,92,0.2);
+      border-radius: 12px;
+      font-size: 13px; font-weight: 700; font-family: var(--sans); cursor: pointer;
     }
     .btn-save {
       flex: 2; padding: 12px;
-      background: linear-gradient(135deg, #5b5ef4, #8b5cf6); color: white;
-      border: none; border-radius: 10px;
-      font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer;
-    }
-
-    /* ENTRY ITEM with edit button */
-    .entry-item { cursor: pointer; transition: box-shadow 0.15s; }
-    .entry-item:active { box-shadow: 0 0 0 2px var(--primary); }
-    .entry-list { display: flex; flex-direction: column; gap: 8px; }
-    .entry-item {
-      background: var(--surface);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow);
-    }
-    .entry-desc { font-size: 14px; font-weight: 600; }
-    .entry-meta { font-size: 12px; color: var(--sub); margin-top: 2px; }
-    .entry-amt-income { font-size: 15px; font-weight: 700; color: var(--income); }
-    .entry-amt-expense { font-size: 15px; font-weight: 700; color: var(--expense); }
-
-    /* TABS */
-    .view-tabs {
-      display: flex;
-      gap: 8px;
-      margin: 0 16px 14px;
-    }
-    .view-tab {
-      flex: 1;
-      padding: 9px;
-      border-radius: 10px;
-      border: none;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      background: var(--border);
-      color: var(--sub);
-      transition: all 0.2s;
-    }
-    .view-tab.active {
       background: var(--primary);
-      color: white;
+      color: #ffffff;
+      border: none; border-radius: 12px;
+      font-size: 14px; font-weight: 700; font-family: var(--sans); cursor: pointer;
     }
-
-    .view-panel { display: none; }
-    .view-panel.active { display: block; }
-
-    /* CALENDAR */
-    .cal-wrap { margin: 0 16px 16px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-    .cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg); border-bottom: 1px solid var(--border); }
-    .cal-dow span { text-align: center; font-size: 11px; font-weight: 700; padding: 8px 0; color: var(--sub); }
-    .cal-dow span:first-child { color: #ef4444; }
-    .cal-dow span:last-child { color: #5b5ef4; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
-    .cal-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); min-height: 64px; padding: 6px 5px; cursor: default; }
-    .cal-cell:nth-child(7n) { border-right: none; }
-    .cal-cell.has-data { cursor: pointer; }
-    .cal-cell.has-data:active { background: #f0f0ff; }
-    .cal-cell.today { background: #f5f4ff; }
-    .cal-cell.empty { background: var(--bg); }
-    .cal-day { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
-    .cal-cell:nth-child(7n+1) .cal-day { color: #ef4444; }
-    .cal-cell:nth-child(7n) .cal-day { color: #5b5ef4; }
-    .cal-cell.today .cal-day { background: var(--primary); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
-    .cal-amt { font-size: 10px; font-weight: 700; color: var(--expense); line-height: 1.3; }
-    .day-detail { margin: 0 16px 16px; }
-    .day-detail-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
-    .cal-cell.selected-day { background: #eeecff; }
   </style>
 </head>
 <body>
 
 <header>
   <div class="header-top">
-    <div class="header-title">💰 내 가계부</div>
+    <div>
+      <div class="header-title">내 <span>가계부</span></div>
+    </div>
     <div class="header-year" id="yearLabel"></div>
   </div>
   <div class="month-scroll" id="monthTabs"></div>
 </header>
 
-<div class="summary" style="grid-template-columns:1fr 1fr;">
-  <div class="card">
+<div class="summary">
+  <div class="card red-card">
     <div class="label">이번 달 지출</div>
     <div class="amount expense-color" id="totalExpense">0원</div>
   </div>
   <div class="card">
-    <div class="label">예산</div>
+    <div class="label">월 예산</div>
     <div class="amount balance-color" id="totalBudget">미설정</div>
   </div>
 </div>
 
-<!-- BUDGET BAR -->
 <div class="budget-bar-wrap">
   <div class="budget-bar-top">
     <div class="budget-bar-label">잔여 예산</div>
@@ -448,12 +535,11 @@
     <span id="budgetUsedAmt"></span>
   </div>
   <div class="budget-edit-row">
-    <input class="budget-input" type="number" id="budgetInput" placeholder="이번 달 예산 입력 (원)" inputmode="numeric">
+    <input class="budget-input" type="number" id="budgetInput" placeholder="이번 달 예산 (원)" inputmode="numeric">
     <button class="btn-budget" onclick="saveBudget()">설정</button>
   </div>
 </div>
 
-<!-- VIEW TABS -->
 <div class="view-tabs">
   <button class="view-tab active" onclick="switchView('add')">➕ 추가</button>
   <button class="view-tab" onclick="switchView('chart')">📊 차트</button>
@@ -461,21 +547,14 @@
   <button class="view-tab" onclick="switchView('list')">📋 내역</button>
 </div>
 
-<!-- ADD PANEL -->
 <div class="view-panel active" id="panel-add">
   <div class="section">
     <div class="form-card">
       <div class="form-row">
         <select id="category">
-          <option>외식비</option>
-          <option>자기계발비</option>
-          <option>취미</option>
-          <option>생필품</option>
-          <option>교통비</option>
-          <option>식비</option>
-          <option>고정비</option>
-          <option>데이트</option>
-          <option>기타</option>
+          <option>외식비</option><option>자기계발비</option><option>취미</option>
+          <option>생필품</option><option>교통비</option><option>식비</option>
+          <option>고정비</option><option>데이트</option><option>기타</option>
         </select>
       </div>
       <div class="form-row">
@@ -489,23 +568,19 @@
   </div>
 </div>
 
-<!-- CHART PANEL -->
 <div class="view-panel" id="panel-chart">
   <div class="section">
     <div class="chart-card">
       <div class="section-title">카테고리별 지출</div>
-      <div class="chart-wrap">
-        <canvas id="myChart"></canvas>
-      </div>
+      <div class="chart-wrap"><canvas id="myChart"></canvas></div>
     </div>
   </div>
   <div class="section">
-    <div class="section-title">📁 카테고리 상세</div>
+    <div class="section-title">상세 내역</div>
     <div class="cat-list" id="catList"></div>
   </div>
 </div>
 
-<!-- CALENDAR PANEL -->
 <div class="view-panel" id="panel-cal">
   <div class="cal-wrap">
     <div class="cal-dow">
@@ -519,19 +594,17 @@
   </div>
 </div>
 
-<!-- LIST PANEL -->
 <div class="view-panel" id="panel-list">
   <div class="section">
-    <div class="section-title">📋 전체 내역</div>
+    <div class="section-title">전체 내역</div>
     <div class="entry-list" id="entryList"></div>
   </div>
 </div>
 
-<!-- EDIT MODAL -->
 <div class="edit-modal-overlay" id="editModalOverlay" onclick="closeEditModal(event)">
   <div class="edit-modal">
     <div class="edit-modal-title">
-      <span>✏️ 내역 수정</span>
+      <span>내역 수정</span>
       <button class="modal-close" onclick="closeEditModalDirect()">✕</button>
     </div>
     <div class="edit-field">
@@ -576,10 +649,10 @@
   const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const CATS = ['외식비','자기계발비','취미','생필품','교통비','식비','고정비','데이트','기타'];
   const CAT_ICONS = {'외식비':'🍽️','자기계발비':'📚','취미':'🎮','생필품':'🛒','교통비':'🚇','식비':'🥗','고정비':'🏠','데이트':'💑','기타':'📦'};
-  const CAT_COLORS = ['#5b5ef4','#8b5cf6','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#f97316','#6b7280'];
+  const CAT_COLORS = ['#60a5fa','#a78bfa','#f472b6','#fb923c','#34d399','#c8f03a','#f87171','#fbbf24','#94a3b8'];
 
   let now = new Date();
-  let currentMonth = now.getMonth(); // 0-indexed
+  let currentMonth = now.getMonth();
   let currentYear = now.getFullYear();
   let chartInstance = null;
   let activeView = 'add';
@@ -587,7 +660,7 @@
   function storageKey() { return `entries_${currentYear}_${currentMonth}`; }
   function budgetKey() { return `budget_${currentYear}_${currentMonth}`; }
   function getEntries() { return JSON.parse(localStorage.getItem(storageKey()) || '[]'); }
-  function saveEntries(entries) { localStorage.setItem(storageKey(), JSON.stringify(entries)); }
+  function saveEntries(e) { localStorage.setItem(storageKey(), JSON.stringify(e)); }
   function getBudget() { return parseInt(localStorage.getItem(budgetKey()) || '0'); }
   function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
 
@@ -610,7 +683,6 @@
       btn.onclick = () => { currentMonth = i; buildMonthTabs(); render(); };
       container.appendChild(btn);
     });
-    // scroll active into view
     setTimeout(() => {
       const active = container.querySelector('.active');
       if (active) active.scrollIntoView({ inline: 'center', behavior: 'smooth' });
@@ -627,15 +699,14 @@
     document.getElementById('totalExpense').textContent = fmt(expense);
     document.getElementById('totalBudget').textContent = budget > 0 ? fmt(budget) : '미설정';
 
-    // budget bar
     const fill = document.getElementById('budgetFill');
     const remainEl = document.getElementById('remainBudget');
     if (budget > 0) {
       remainEl.textContent = fmt(Math.max(remain, 0));
-      remainEl.style.color = remain < 0 ? 'var(--expense)' : 'var(--income)';
+      remainEl.style.color = remain < 0 ? 'var(--red)' : 'var(--primary)';
       fill.style.width = pct + '%';
-      fill.style.background = pct >= 90 ? '#ef4444' : pct >= 70 ? '#f97316' : 'linear-gradient(90deg,#5b5ef4,#8b5cf6)';
-      document.getElementById('budgetUsedPct').textContent = `사용 ${pct}%`;
+      fill.style.background = pct >= 90 ? 'var(--red)' : pct >= 70 ? '#fb923c' : 'var(--primary)';
+      document.getElementById('budgetUsedPct').textContent = `${pct}% 사용`;
       document.getElementById('budgetUsedAmt').textContent = remain < 0 ? `${fmt(-remain)} 초과` : `${fmt(remain)} 남음`;
     } else {
       remainEl.textContent = '—';
@@ -653,32 +724,28 @@
   function renderChart(entries) {
     const totals = CATS.map(c => entries.filter(e => e.category === c).reduce((s,e) => s+e.amount, 0));
     const hasData = totals.some(t => t > 0);
-
     const ctx = document.getElementById('myChart').getContext('2d');
     if (chartInstance) chartInstance.destroy();
-
     if (!hasData) {
       chartInstance = null;
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.font = '14px Pretendard, sans-serif';
-      ctx.fillStyle = '#aaa';
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.font = '13px Outfit, sans-serif';
+      ctx.fillStyle = '#555';
       ctx.textAlign = 'center';
-      ctx.fillText('지출 내역이 없어요', ctx.canvas.width/2, 110);
+      ctx.fillText('지출 내역이 없어요', ctx.canvas.width/2, 100);
       return;
     }
-
     const filtered = CATS.map((c,i) => ({ label: c, value: totals[i], color: CAT_COLORS[i] })).filter(d => d.value > 0);
-
     chartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: filtered.map(d => d.label),
         datasets: [{
           data: filtered.map(d => d.value),
-          backgroundColor: filtered.map(d => d.color),
-          borderWidth: 3,
-          borderColor: '#fff',
-          hoverOffset: 8
+          backgroundColor: filtered.map(d => d.color + '22'),
+          borderColor: filtered.map(d => d.color),
+          borderWidth: 2,
+          hoverOffset: 6
         }]
       },
       options: {
@@ -687,20 +754,9 @@
         plugins: {
           legend: {
             position: 'right',
-            labels: {
-              font: { size: 12, family: 'Pretendard' },
-              padding: 12,
-              boxWidth: 12,
-              boxHeight: 12,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
+            labels: { font: { size: 11, family: 'Outfit' }, color: '#888', padding: 10, boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle' }
           },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('ko-KR')}원`
-            }
-          }
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('ko-KR')}원` } }
         }
       }
     });
@@ -709,47 +765,30 @@
   function renderCatList(entries) {
     const maxTotal = Math.max(...CATS.map(c => entries.filter(e => e.category === c).reduce((s,e) => s+e.amount, 0)), 1);
     const container = document.getElementById('catList');
-
-    const rows = CATS.map((cat, i) => {
-      const total = entries.filter(e => e.category === cat).reduce((s,e) => s+e.amount, 0);
-      return { cat, total, i };
-    }).filter(r => r.total > 0).sort((a,b) => b.total - a.total);
-
-    if (rows.length === 0) {
-      container.innerHTML = '<div class="empty">지출 내역이 없어요</div>';
-      return;
-    }
-
+    const rows = CATS.map((cat, i) => ({ cat, total: entries.filter(e => e.category === cat).reduce((s,e) => s+e.amount, 0), i }))
+      .filter(r => r.total > 0).sort((a,b) => b.total - a.total);
+    if (rows.length === 0) { container.innerHTML = '<div class="empty">지출 내역이 없어요</div>'; return; }
     container.innerHTML = rows.map(({cat, total, i}) => `
       <div class="cat-item" onclick="openModal('${cat}')">
         <div class="cat-header">
-          <div class="cat-name">${CAT_ICONS[cat] || '📦'} ${cat}</div>
+          <div class="cat-name">${CAT_ICONS[cat]||'📦'} ${cat}</div>
           <div class="cat-total">${fmt(total)}</div>
         </div>
-        <div class="cat-bar-bg">
-          <div class="cat-bar" style="width:${Math.round(total/maxTotal*100)}%; background:${CAT_COLORS[i]}"></div>
-        </div>
-      </div>
-    `).join('');
+        <div class="cat-bar-bg"><div class="cat-bar" style="width:${Math.round(total/maxTotal*100)}%;background:${CAT_COLORS[i]}"></div></div>
+      </div>`).join('');
   }
 
   function renderEntryList(entries) {
     const container = document.getElementById('entryList');
-    if (entries.length === 0) {
-      container.innerHTML = '<div class="empty">아직 내역이 없어요</div>';
-      return;
-    }
-    // entries를 역순으로 보여주되 실제 인덱스 유지
-    const indexed = entries.map((e, i) => ({ ...e, realIndex: i })).reverse();
-    container.innerHTML = indexed.map(e => `
+    if (entries.length === 0) { container.innerHTML = '<div class="empty">아직 내역이 없어요</div>'; return; }
+    container.innerHTML = entries.map((e,i) => ({...e, realIndex: i})).reverse().map(e => `
       <div class="entry-item" onclick="openEditModal(${e.realIndex})">
         <div>
-          <div class="entry-desc">${e.desc} <span style="font-size:11px;color:#aaa">[${e.category}]</span></div>
+          <div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub)">[${e.category}]</span></div>
           <div class="entry-meta">${e.date} · 탭해서 수정</div>
         </div>
         <div class="entry-amt-expense">-${fmt(e.amount)}</div>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
   function addEntry() {
@@ -770,9 +809,7 @@
   function switchView(view) {
     activeView = view;
     const views = ['add','chart','cal','list'];
-    document.querySelectorAll('.view-tab').forEach((t,i) => {
-      t.classList.toggle('active', views[i] === view);
-    });
+    document.querySelectorAll('.view-tab').forEach((t,i) => t.classList.toggle('active', views[i] === view));
     document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-' + view).classList.add('active');
     if (view === 'chart') render();
@@ -781,88 +818,62 @@
 
   function renderCalendar(selectedDay) {
     const entries = getEntries();
-    const year = currentYear;
-    const month = currentMonth;
+    const year = currentYear, month = currentMonth;
     const today = new Date();
-    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    // 날짜별 합계 계산 (날짜 문자열 "M/D" 기준)
     const dayMap = {};
     entries.forEach(e => {
-      const dayStr = e.date.split(' ')[0]; // "5/10" 형식
+      const dayStr = e.date.split(' ')[0];
       if (!dayMap[dayStr]) dayMap[dayStr] = [];
       dayMap[dayStr].push(e);
     });
-
     const grid = document.getElementById('calGrid');
     let html = '';
-
-    // 빈 칸 채우기
-    for (let i = 0; i < firstDay; i++) {
-      html += `<div class="cal-cell empty"></div>`;
-    }
-
+    for (let i = 0; i < firstDay; i++) html += `<div class="cal-cell empty"></div>`;
     for (let d = 1; d <= daysInMonth; d++) {
       const dayStr = `${month+1}/${d}`;
       const dayEntries = dayMap[dayStr] || [];
       const total = dayEntries.reduce((s,e) => s+e.amount, 0);
       const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
-      const isSelected = selectedDay === d;
       const hasData = dayEntries.length > 0;
-
-      html += `<div class="cal-cell ${hasData?'has-data':''} ${isToday?'today':''} ${isSelected?'selected-day':''}"
-        onclick="${hasData ? `showDayDetail(${d})` : ''}">
+      html += `<div class="cal-cell ${hasData?'has-data':''} ${isToday?'today':''} ${selectedDay===d?'selected-day':''}" onclick="${hasData?`showDayDetail(${d})`:''}">
         <div class="cal-day">${d}</div>
         ${total > 0 ? `<div class="cal-amt">${(total/10000).toFixed(1)}만</div>` : ''}
       </div>`;
     }
-
     grid.innerHTML = html;
-
-    // 선택된 날 상세 표시
     if (selectedDay) {
       const dayStr = `${month+1}/${selectedDay}`;
-      const dayEntries = (dayMap[dayStr] || []).map((e,i) => ({...e, realIndex: entries.findIndex(x => x===e)}));
+      const dayEntries = dayMap[dayStr] || [];
       const total = dayEntries.reduce((s,e) => s+e.amount, 0);
-      document.getElementById('dayDetailTitle').textContent = `${month+1}월 ${selectedDay}일 · 총 ${fmt(total)}`;
+      document.getElementById('dayDetailTitle').textContent = `${month+1}월 ${selectedDay}일 · ${fmt(total)}`;
       document.getElementById('dayEntryList').innerHTML = dayEntries.map(e => `
         <div class="entry-item" onclick="openEditModal(${entries.indexOf(e)})">
           <div>
-            <div class="entry-desc">${e.desc} <span style="font-size:11px;color:#aaa">[${e.category}]</span></div>
+            <div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub)">[${e.category}]</span></div>
             <div class="entry-meta">${e.date} · 탭해서 수정</div>
           </div>
           <div class="entry-amt-expense">-${fmt(e.amount)}</div>
-        </div>
-      `).join('');
+        </div>`).join('');
       document.getElementById('dayDetail').style.display = 'block';
     } else {
       document.getElementById('dayDetail').style.display = 'none';
     }
   }
 
-  function showDayDetail(d) {
-    renderCalendar(d);
-  }
+  function showDayDetail(d) { renderCalendar(d); }
 
   function openModal(cat) {
     const entries = getEntries().filter(e => e.category === cat);
     const total = entries.reduce((s,e) => s+e.amount, 0);
     document.getElementById('modalTitle').textContent = `${CAT_ICONS[cat]} ${cat} · ${fmt(total)}`;
-    const body = document.getElementById('modalBody');
-    if (entries.length === 0) {
-      body.innerHTML = '<div class="empty">내역이 없어요</div>';
-    } else {
-      body.innerHTML = [...entries].reverse().map(e => `
+    document.getElementById('modalBody').innerHTML = entries.length === 0 ? '<div class="empty">내역이 없어요</div>' :
+      [...entries].reverse().map(e => `
         <div class="detail-item">
-          <div>
-            <div class="detail-desc">${e.desc}</div>
-            <div class="detail-meta">${e.date}</div>
-          </div>
-          <div class="detail-amt expense-color">-${fmt(e.amount)}</div>
-        </div>
-      `).join('');
-    }
+          <div><div class="detail-desc">${e.desc}</div><div class="detail-meta">${e.date}</div></div>
+          <div class="detail-amt">-${fmt(e.amount)}</div>
+        </div>`).join('');
     document.getElementById('modalOverlay').classList.add('open');
   }
 
@@ -876,27 +887,16 @@
     document.getElementById('editCategory').value = e.category;
     document.getElementById('editDesc').value = e.desc;
     document.getElementById('editAmount').value = e.amount;
-
-    // 저장된 날짜 "M/D HH:MM" → date input용 "YYYY-MM-DD" 변환
     try {
       const [datePart] = e.date.split(' ');
       const [m, d] = datePart.split('/');
-      const yyyy = currentYear;
-      const mm = String(m).padStart(2,'0');
-      const dd = String(d).padStart(2,'0');
-      document.getElementById('editDate').value = `${yyyy}-${mm}-${dd}`;
+      document.getElementById('editDate').value = `${currentYear}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     } catch { document.getElementById('editDate').value = ''; }
-
     document.getElementById('editModalOverlay').classList.add('open');
   }
 
-  function closeEditModal(event) {
-    if (event.target === document.getElementById('editModalOverlay')) closeEditModalDirect();
-  }
-  function closeEditModalDirect() {
-    document.getElementById('editModalOverlay').classList.remove('open');
-    editingIndex = -1;
-  }
+  function closeEditModal(event) { if (event.target === document.getElementById('editModalOverlay')) closeEditModalDirect(); }
+  function closeEditModalDirect() { document.getElementById('editModalOverlay').classList.remove('open'); editingIndex = -1; }
 
   function saveEdit() {
     if (editingIndex < 0) return;
@@ -904,8 +904,6 @@
     const amount = parseInt(document.getElementById('editAmount').value);
     const category = document.getElementById('editCategory').value;
     if (!desc || !amount || amount <= 0) { alert('내용과 금액을 입력해주세요!'); return; }
-
-    // date input "YYYY-MM-DD" → "M/D HH:MM" 형식으로 변환 (시간은 기존 유지)
     let newDate = getEntries()[editingIndex].date;
     const dateVal = document.getElementById('editDate').value;
     if (dateVal) {
@@ -913,7 +911,6 @@
       const timePart = newDate.includes(' ') ? newDate.split(' ')[1] : '00:00';
       newDate = `${parseInt(mm)}/${parseInt(dd)} ${timePart}`;
     }
-
     const entries = getEntries();
     entries[editingIndex] = { ...entries[editingIndex], desc, amount, category, date: newDate };
     saveEntries(entries);
@@ -933,14 +930,9 @@
     if (activeView === 'cal') renderCalendar();
   }
 
-  function closeModal(event) {
-    if (event.target === document.getElementById('modalOverlay')) closeModalDirect();
-  }
-  function closeModalDirect() {
-    document.getElementById('modalOverlay').classList.remove('open');
-  }
+  function closeModal(event) { if (event.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+  function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-  // Init
   buildMonthTabs();
   render();
 </script>
