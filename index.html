@@ -645,7 +645,26 @@
   </div>
 </div>
 
-<script>
+<div id="loadingBar" style="display:none;position:fixed;top:0;left:0;right:0;height:3px;background:var(--primary);z-index:999;animation:loadpulse 1s infinite alternate">
+</div>
+<style>@keyframes loadpulse{from{opacity:0.4}to{opacity:1}}</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzbqz6rFZyBcLlRtdtAZDTKaB6skCbLT8",
+    authDomain: "hj-budget-app.firebaseapp.com",
+    projectId: "hj-budget-app",
+    storageBucket: "hj-budget-app.firebasestorage.app",
+    messagingSenderId: "473210016002",
+    appId: "1:473210016002:web:59221e2e9a821a911ab21b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const CATS = ['외식비','자기계발비','취미','생필품','교통비','식비','고정비','데이트','기타'];
   const CAT_ICONS = {'외식비':'🍽️','자기계발비':'📚','취미':'🎮','생필품':'🛒','교통비':'🚇','식비':'🥗','고정비':'🏠','데이트':'💑','기타':'📦'};
@@ -656,21 +675,45 @@
   let currentYear = now.getFullYear();
   let chartInstance = null;
   let activeView = 'add';
+  let cachedEntries = [];
+  let cachedBudget = 0;
 
-  function storageKey() { return `entries_${currentYear}_${currentMonth}`; }
-  function budgetKey() { return `budget_${currentYear}_${currentMonth}`; }
-  function getEntries() { return JSON.parse(localStorage.getItem(storageKey()) || '[]'); }
-  function saveEntries(e) { localStorage.setItem(storageKey(), JSON.stringify(e)); }
-  function getBudget() { return parseInt(localStorage.getItem(budgetKey()) || '0'); }
+  function docId() { return `${currentYear}_${currentMonth}`; }
   function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
+  function showLoading(on) { document.getElementById('loadingBar').style.display = on ? 'block' : 'none'; }
 
-  function saveBudget() {
-    const val = parseInt(document.getElementById('budgetInput').value);
-    if (!val || val <= 0) { alert('예산을 올바르게 입력해주세요!'); return; }
-    localStorage.setItem(budgetKey(), val);
-    document.getElementById('budgetInput').value = '';
+  async function loadData() {
+    showLoading(true);
+    try {
+      const snap = await getDoc(doc(db, 'budgets', docId()));
+      if (snap.exists()) {
+        const data = snap.data();
+        cachedEntries = data.entries || [];
+        cachedBudget = data.budget || 0;
+      } else {
+        cachedEntries = [];
+        cachedBudget = 0;
+      }
+    } catch(e) { console.error(e); }
+    showLoading(false);
     render();
   }
+
+  async function saveData() {
+    try {
+      await setDoc(doc(db, 'budgets', docId()), { entries: cachedEntries, budget: cachedBudget });
+    } catch(e) { alert('저장 오류. 인터넷 연결을 확인해주세요.'); }
+  }
+
+  async function saveBudget() {
+    const val = parseInt(document.getElementById('budgetInput').value);
+    if (!val || val <= 0) { alert('예산을 올바르게 입력해주세요!'); return; }
+    cachedBudget = val;
+    document.getElementById('budgetInput').value = '';
+    await saveData();
+    render();
+  }
+  window.saveBudget = saveBudget;
 
   function buildMonthTabs() {
     const container = document.getElementById('monthTabs');
@@ -680,7 +723,7 @@
       const btn = document.createElement('button');
       btn.className = 'month-tab' + (i === currentMonth ? ' active' : '');
       btn.textContent = m;
-      btn.onclick = () => { currentMonth = i; buildMonthTabs(); render(); };
+      btn.onclick = () => { currentMonth = i; buildMonthTabs(); loadData(); };
       container.appendChild(btn);
     });
     setTimeout(() => {
@@ -690,9 +733,9 @@
   }
 
   function render() {
-    const entries = getEntries();
+    const entries = cachedEntries;
+    const budget = cachedBudget;
     const expense = entries.reduce((s,e) => s+e.amount, 0);
-    const budget = getBudget();
     const remain = budget - expense;
     const pct = budget > 0 ? Math.min(Math.round(expense / budget * 100), 100) : 0;
 
@@ -715,10 +758,10 @@
       document.getElementById('budgetUsedPct').textContent = '예산을 설정해주세요';
       document.getElementById('budgetUsedAmt').textContent = '';
     }
-
     renderChart(entries);
     renderCatList(entries);
     renderEntryList(entries);
+    if (activeView === 'cal') renderCalendar();
   }
 
   function renderChart(entries) {
@@ -738,42 +781,19 @@
     const filtered = CATS.map((c,i) => ({ label: c, value: totals[i], color: CAT_COLORS[i] })).filter(d => d.value > 0);
     chartInstance = new Chart(ctx, {
       type: 'doughnut',
-      data: {
-        labels: filtered.map(d => d.label),
-        datasets: [{
-          data: filtered.map(d => d.value),
-          backgroundColor: filtered.map(d => d.color + '22'),
-          borderColor: filtered.map(d => d.color),
-          borderWidth: 2,
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: { font: { size: 11, family: 'Outfit' }, color: '#888', padding: 10, boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle' }
-          },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('ko-KR')}원` } }
-        }
-      }
+      data: { labels: filtered.map(d => d.label), datasets: [{ data: filtered.map(d => d.value), backgroundColor: filtered.map(d => d.color+'22'), borderColor: filtered.map(d => d.color), borderWidth: 2, hoverOffset: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { size: 11, family: 'Outfit' }, color: '#888', padding: 10, boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('ko-KR')}원` } } } }
     });
   }
 
   function renderCatList(entries) {
     const maxTotal = Math.max(...CATS.map(c => entries.filter(e => e.category === c).reduce((s,e) => s+e.amount, 0)), 1);
     const container = document.getElementById('catList');
-    const rows = CATS.map((cat, i) => ({ cat, total: entries.filter(e => e.category === cat).reduce((s,e) => s+e.amount, 0), i }))
-      .filter(r => r.total > 0).sort((a,b) => b.total - a.total);
+    const rows = CATS.map((cat, i) => ({ cat, total: entries.filter(e => e.category === cat).reduce((s,e) => s+e.amount, 0), i })).filter(r => r.total > 0).sort((a,b) => b.total - a.total);
     if (rows.length === 0) { container.innerHTML = '<div class="empty">지출 내역이 없어요</div>'; return; }
     container.innerHTML = rows.map(({cat, total, i}) => `
       <div class="cat-item" onclick="openModal('${cat}')">
-        <div class="cat-header">
-          <div class="cat-name">${CAT_ICONS[cat]||'📦'} ${cat}</div>
-          <div class="cat-total">${fmt(total)}</div>
-        </div>
+        <div class="cat-header"><div class="cat-name">${CAT_ICONS[cat]||'📦'} ${cat}</div><div class="cat-total">${fmt(total)}</div></div>
         <div class="cat-bar-bg"><div class="cat-bar" style="width:${Math.round(total/maxTotal*100)}%;background:${CAT_COLORS[i]}"></div></div>
       </div>`).join('');
   }
@@ -783,28 +803,25 @@
     if (entries.length === 0) { container.innerHTML = '<div class="empty">아직 내역이 없어요</div>'; return; }
     container.innerHTML = entries.map((e,i) => ({...e, realIndex: i})).reverse().map(e => `
       <div class="entry-item" onclick="openEditModal(${e.realIndex})">
-        <div>
-          <div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub)">[${e.category}]</span></div>
-          <div class="entry-meta">${e.date} · 탭해서 수정</div>
-        </div>
+        <div><div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub)">[${e.category}]</span></div><div class="entry-meta">${e.date} · 탭해서 수정</div></div>
         <div class="entry-amt-expense">-${fmt(e.amount)}</div>
       </div>`).join('');
   }
 
-  function addEntry() {
+  async function addEntry() {
     const category = document.getElementById('category').value;
     const desc = document.getElementById('desc').value.trim();
     const amount = parseInt(document.getElementById('amount').value);
     if (!desc || !amount || amount <= 0) { alert('내용과 금액을 입력해주세요!'); return; }
     const d = new Date();
     const date = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-    const entries = getEntries();
-    entries.push({ category, desc, amount, date });
-    saveEntries(entries);
+    cachedEntries.push({ category, desc, amount, date });
+    await saveData();
     render();
     document.getElementById('desc').value = '';
     document.getElementById('amount').value = '';
   }
+  window.addEntry = addEntry;
 
   function switchView(view) {
     activeView = view;
@@ -815,19 +832,16 @@
     if (view === 'chart') render();
     if (view === 'cal') renderCalendar();
   }
+  window.switchView = switchView;
 
   function renderCalendar(selectedDay) {
-    const entries = getEntries();
+    const entries = cachedEntries;
     const year = currentYear, month = currentMonth;
     const today = new Date();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const dayMap = {};
-    entries.forEach(e => {
-      const dayStr = e.date.split(' ')[0];
-      if (!dayMap[dayStr]) dayMap[dayStr] = [];
-      dayMap[dayStr].push(e);
-    });
+    entries.forEach(e => { const dayStr = e.date.split(' ')[0]; if (!dayMap[dayStr]) dayMap[dayStr] = []; dayMap[dayStr].push(e); });
     const grid = document.getElementById('calGrid');
     let html = '';
     for (let i = 0; i < firstDay; i++) html += `<div class="cal-cell empty"></div>`;
@@ -838,9 +852,7 @@
       const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
       const hasData = dayEntries.length > 0;
       html += `<div class="cal-cell ${hasData?'has-data':''} ${isToday?'today':''} ${selectedDay===d?'selected-day':''}" onclick="${hasData?`showDayDetail(${d})`:''}">
-        <div class="cal-day">${d}</div>
-        ${total > 0 ? `<div class="cal-amt">${(total/10000).toFixed(1)}만</div>` : ''}
-      </div>`;
+        <div class="cal-day">${d}</div>${total > 0 ? `<div class="cal-amt">${(total/10000).toFixed(1)}만</div>` : ''}</div>`;
     }
     grid.innerHTML = html;
     if (selectedDay) {
@@ -850,38 +862,28 @@
       document.getElementById('dayDetailTitle').textContent = `${month+1}월 ${selectedDay}일 · ${fmt(total)}`;
       document.getElementById('dayEntryList').innerHTML = dayEntries.map(e => `
         <div class="entry-item" onclick="openEditModal(${entries.indexOf(e)})">
-          <div>
-            <div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub)">[${e.category}]</span></div>
-            <div class="entry-meta">${e.date} · 탭해서 수정</div>
-          </div>
+          <div><div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub)">[${e.category}]</span></div><div class="entry-meta">${e.date} · 탭해서 수정</div></div>
           <div class="entry-amt-expense">-${fmt(e.amount)}</div>
         </div>`).join('');
       document.getElementById('dayDetail').style.display = 'block';
-    } else {
-      document.getElementById('dayDetail').style.display = 'none';
-    }
+    } else { document.getElementById('dayDetail').style.display = 'none'; }
   }
-
-  function showDayDetail(d) { renderCalendar(d); }
+  window.showDayDetail = (d) => renderCalendar(d);
 
   function openModal(cat) {
-    const entries = getEntries().filter(e => e.category === cat);
+    const entries = cachedEntries.filter(e => e.category === cat);
     const total = entries.reduce((s,e) => s+e.amount, 0);
     document.getElementById('modalTitle').textContent = `${CAT_ICONS[cat]} ${cat} · ${fmt(total)}`;
     document.getElementById('modalBody').innerHTML = entries.length === 0 ? '<div class="empty">내역이 없어요</div>' :
-      [...entries].reverse().map(e => `
-        <div class="detail-item">
-          <div><div class="detail-desc">${e.desc}</div><div class="detail-meta">${e.date}</div></div>
-          <div class="detail-amt">-${fmt(e.amount)}</div>
-        </div>`).join('');
+      [...entries].reverse().map(e => `<div class="detail-item"><div><div class="detail-desc">${e.desc}</div><div class="detail-meta">${e.date}</div></div><div class="detail-amt">-${fmt(e.amount)}</div></div>`).join('');
     document.getElementById('modalOverlay').classList.add('open');
   }
+  window.openModal = openModal;
 
   let editingIndex = -1;
 
   function openEditModal(index) {
-    const entries = getEntries();
-    const e = entries[index];
+    const e = cachedEntries[index];
     if (!e) return;
     editingIndex = index;
     document.getElementById('editCategory').value = e.category;
@@ -894,47 +896,50 @@
     } catch { document.getElementById('editDate').value = ''; }
     document.getElementById('editModalOverlay').classList.add('open');
   }
+  window.openEditModal = openEditModal;
 
   function closeEditModal(event) { if (event.target === document.getElementById('editModalOverlay')) closeEditModalDirect(); }
+  window.closeEditModal = closeEditModal;
   function closeEditModalDirect() { document.getElementById('editModalOverlay').classList.remove('open'); editingIndex = -1; }
+  window.closeEditModalDirect = closeEditModalDirect;
 
-  function saveEdit() {
+  async function saveEdit() {
     if (editingIndex < 0) return;
     const desc = document.getElementById('editDesc').value.trim();
     const amount = parseInt(document.getElementById('editAmount').value);
     const category = document.getElementById('editCategory').value;
     if (!desc || !amount || amount <= 0) { alert('내용과 금액을 입력해주세요!'); return; }
-    let newDate = getEntries()[editingIndex].date;
+    let newDate = cachedEntries[editingIndex].date;
     const dateVal = document.getElementById('editDate').value;
     if (dateVal) {
       const [, mm, dd] = dateVal.split('-');
       const timePart = newDate.includes(' ') ? newDate.split(' ')[1] : '00:00';
       newDate = `${parseInt(mm)}/${parseInt(dd)} ${timePart}`;
     }
-    const entries = getEntries();
-    entries[editingIndex] = { ...entries[editingIndex], desc, amount, category, date: newDate };
-    saveEntries(entries);
+    cachedEntries[editingIndex] = { ...cachedEntries[editingIndex], desc, amount, category, date: newDate };
+    await saveData();
     closeEditModalDirect();
     render();
-    if (activeView === 'cal') renderCalendar();
   }
+  window.saveEdit = saveEdit;
 
-  function deleteEntry() {
+  async function deleteEntry() {
     if (editingIndex < 0) return;
     if (!confirm('이 내역을 삭제할까요?')) return;
-    const entries = getEntries();
-    entries.splice(editingIndex, 1);
-    saveEntries(entries);
+    cachedEntries.splice(editingIndex, 1);
+    await saveData();
     closeEditModalDirect();
     render();
-    if (activeView === 'cal') renderCalendar();
   }
+  window.deleteEntry = deleteEntry;
 
   function closeModal(event) { if (event.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+  window.closeModal = closeModal;
   function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); }
+  window.closeModalDirect = closeModalDirect;
 
   buildMonthTabs();
-  render();
+  loadData();
 </script>
 </body>
 </html>
