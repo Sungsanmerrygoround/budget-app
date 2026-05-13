@@ -11,26 +11,24 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F5F4F0;
+      --bg: #F4F2FB;
       --surface: #FFFFFF;
-      --surface2: #EEECEA;
-      --border: rgba(15, 23, 42, 0.07);
-      --shadow-xs: 0 1px 2px rgba(15,23,42,0.04), 0 1px 4px rgba(15,23,42,0.03);
-      --shadow-sm: 0 1px 4px rgba(15,23,42,0.05), 0 3px 12px rgba(15,23,42,0.04);
-      --shadow-md: 0 4px 16px rgba(15,23,42,0.07), 0 2px 6px rgba(15,23,42,0.04);
-      --shadow-lg: 0 12px 48px rgba(15,23,42,0.14), 0 4px 14px rgba(15,23,42,0.06);
+      --surface2: #EFECF8;
+      --border: rgba(79,70,229,0.08);
+      --shadow-xs: 0 1px 3px rgba(79,70,229,0.06), 0 1px 2px rgba(0,0,0,0.03);
+      --shadow-sm: 0 2px 10px rgba(79,70,229,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 20px rgba(79,70,229,0.11), 0 2px 6px rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 40px rgba(79,70,229,0.17), 0 3px 12px rgba(0,0,0,0.07);
       --primary: #4F46E5;
       --primary-soft: #EEF2FF;
-      --primary-dim: rgba(79,70,229,0.12);
-      --red: #DC3545;
-      --red-soft: #FFF1F2;
-      --red-dim: rgba(220,53,69,0.1);
-      --green: #059669;
-      --text: #111827;
-      --sub: #6B7280;
-      --sub2: #9CA3AF;
-      --radius: 18px;
-      --radius-sm: 12px;
+      --primary-dim: rgba(79,70,229,0.1);
+      --red: #EF4444;
+      --red-soft: #FFF5F5;
+      --text: #0F172A;
+      --sub: #64748B;
+      --sub2: #94A3B8;
+      --radius: 20px;
+      --radius-sm: 14px;
       --serif: 'DM Serif Display', serif;
       --sans: 'Outfit', 'Noto Sans KR', sans-serif;
     }
@@ -42,12 +40,12 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding-bottom: 52px;
+      padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
     }
 
     /* ─── HEADER ─── */
     header {
-      padding: 54px 20px 0;
+      padding: calc(env(safe-area-inset-top, 44px) + 4px) 20px 0;
       background: var(--bg);
       position: sticky;
       top: 0;
@@ -58,36 +56,28 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
-
-    .header-left { display: flex; flex-direction: column; gap: 4px; }
 
     .header-title {
       font-family: var(--serif);
-      font-size: 30px;
+      font-size: 28px;
       color: var(--text);
       letter-spacing: -0.5px;
-      line-height: 1;
     }
 
     .header-title span { color: var(--primary); }
 
     .header-year {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
       font-size: 11px;
       color: var(--sub);
       font-weight: 600;
       letter-spacing: 0.06em;
-      text-transform: uppercase;
       background: var(--surface);
-      padding: 5px 11px;
+      padding: 6px 12px;
       border-radius: 20px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow-xs);
-      width: fit-content;
     }
 
     /* ─── MONTH TABS ─── */
@@ -106,7 +96,6 @@
       border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
-      font-family: var(--sans);
       cursor: pointer;
       border: 1px solid var(--border);
       background: var(--surface);
@@ -114,204 +103,156 @@
       transition: all 0.2s cubic-bezier(.4,0,.2,1);
       box-shadow: var(--shadow-xs);
     }
-
-    .month-tab:active { transform: scale(0.96); }
 
     .month-tab.active {
       background: var(--primary);
       color: #fff;
       border-color: var(--primary);
-      box-shadow: 0 3px 10px rgba(79,70,229,0.32);
+      box-shadow: 0 3px 12px rgba(79,70,229,0.35);
     }
 
-    /* ─── SUMMARY ─── */
-    .summary {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 0 16px 12px;
-    }
-
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 18px;
-      border: 1px solid var(--border);
+    /* ─── HERO CARD ─── */
+    .hero-card {
+      margin: 0 16px 16px;
+      background: linear-gradient(135deg, #5B5BD6 0%, #4338CA 55%, #312E81 100%);
+      border-radius: 26px;
+      padding: 26px 24px 22px;
       position: relative;
       overflow: hidden;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 8px 40px rgba(67,56,202,0.32), 0 2px 8px rgba(67,56,202,0.15);
     }
 
-    .card-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -40px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -20px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .hero-amount {
+      font-family: var(--serif);
+      font-size: 42px;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .hero-budget-row {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      font-size: 17px;
       margin-bottom: 12px;
     }
 
-    .card.red-card .card-icon { background: var(--red-soft); }
-    .card:not(.red-card) .card-icon { background: var(--primary-soft); }
-
-    .card .label {
-      font-size: 10px;
-      color: var(--sub);
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-
-    .card .amount {
-      font-family: var(--serif);
-      font-size: 19px;
-      letter-spacing: -0.3px;
-      line-height: 1.2;
-    }
-
-    .expense-color { color: var(--red); }
-    .balance-color { color: var(--primary); }
-
-    /* ─── BUDGET BAR ─── */
-    .budget-bar-wrap {
-      margin: 0 16px 12px;
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 20px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .budget-bar-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 14px;
-    }
-
-    .budget-bar-label {
-      font-size: 10px;
-      color: var(--sub);
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .budget-bar-remain {
-      font-family: var(--serif);
-      font-size: 24px;
-      color: var(--primary);
-      letter-spacing: -0.5px;
-    }
-
-    .budget-bg {
-      background: var(--surface2);
-      border-radius: 6px;
-      height: 7px;
-      overflow: hidden;
-    }
-
-    .budget-fill {
-      height: 100%;
-      border-radius: 6px;
-      transition: width 0.65s cubic-bezier(.4,0,.2,1), background 0.3s;
-    }
-
-    .budget-sub {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-size: 11px;
-      color: var(--sub);
+    .hero-budget-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
       font-weight: 500;
     }
 
-    .budget-edit-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
+    .hero-budget-label span { color: rgba(255,255,255,0.75); font-weight: 600; }
+
+    .hero-budget-remain {
+      font-family: var(--serif);
+      font-size: 18px;
+      color: rgba(255,255,255,0.9);
     }
 
-    .budget-input {
+    .hero-bar-bg {
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
+      height: 6px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .hero-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.85);
+      transition: width 0.65s cubic-bezier(.4,0,.2,1), background 0.3s;
+    }
+
+    .hero-bar-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+      margin-bottom: 18px;
+    }
+
+    .hero-budget-edit { display: flex; gap: 8px; }
+
+    .hero-budget-input {
       flex: 1;
-      padding: 11px 13px;
-      border: 1.5px solid var(--border);
-      border-radius: 11px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 13px;
       font-size: 14px;
       font-family: var(--sans);
-      background: var(--surface2);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    }
-
-    .budget-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-dim);
-      background: var(--surface);
-    }
-
-    .btn-budget {
-      padding: 11px 18px;
-      background: var(--primary);
       color: #fff;
-      border: none;
-      border-radius: 11px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .hero-budget-input::placeholder { color: rgba(255,255,255,0.38); }
+    .hero-budget-input:focus {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    .hero-btn-budget {
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.22);
+      border-radius: 13px;
       font-size: 13px;
       font-weight: 700;
       font-family: var(--sans);
       cursor: pointer;
       white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(79,70,229,0.28);
       transition: all 0.15s;
     }
-    .btn-budget:active { opacity: 0.85; transform: scale(0.97); }
 
-    /* ─── VIEW TABS ─── */
-    .view-tabs {
-      display: flex;
-      margin: 0 16px 14px;
-      background: var(--surface);
-      border-radius: 14px;
-      padding: 4px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-xs);
-    }
+    .hero-btn-budget:active { background: rgba(255,255,255,0.28); }
 
-    .view-tab {
-      flex: 1;
-      padding: 9px 4px;
-      border-radius: 10px;
-      border: none;
-      font-size: 11px;
-      font-weight: 600;
-      font-family: var(--sans);
-      cursor: pointer;
-      background: transparent;
-      color: var(--sub);
-      transition: all 0.2s cubic-bezier(.4,0,.2,1);
-    }
-
-    .view-tab.active {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(79,70,229,0.28);
-    }
-
-    .view-panel { display: none; }
+    /* ─── VIEW PANELS ─── */
+    .view-panel { display: none; padding-top: 4px; }
     .view-panel.active { display: block; }
 
-    /* ─── SECTION ─── */
     .section { margin: 0 16px 14px; }
 
     .section-title {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--sub2);
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       margin-bottom: 10px;
     }
@@ -320,14 +261,14 @@
     .form-card {
       background: var(--surface);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 22px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
     }
 
-    .form-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
 
-    .field-wrap { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+    .field-wrap { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 
     .field-label {
       font-size: 10px;
@@ -342,7 +283,7 @@
       width: 100%;
       padding: 13px 14px;
       border: 1.5px solid var(--border);
-      border-radius: 12px;
+      border-radius: 13px;
       font-size: 14px;
       font-family: var(--sans);
       background: var(--surface2);
@@ -363,17 +304,15 @@
     .select-wrap::after {
       content: '▾';
       position: absolute;
-      right: 13px;
-      top: 50%;
+      right: 13px; top: 50%;
       transform: translateY(-50%);
-      font-size: 11px;
-      color: var(--sub);
+      font-size: 11px; color: var(--sub);
       pointer-events: none;
     }
 
     .btn-add {
       width: 100%;
-      padding: 15px;
+      padding: 16px;
       background: var(--primary);
       color: #fff;
       font-weight: 700;
@@ -381,56 +320,42 @@
       font-size: 15px;
       letter-spacing: 0.02em;
       cursor: pointer;
-      margin-top: 6px;
+      margin-top: 8px;
       border: none;
       border-radius: var(--radius-sm);
       box-shadow: 0 4px 18px rgba(79,70,229,0.3);
-      transition: all 0.15s cubic-bezier(.4,0,.2,1);
+      transition: all 0.15s;
     }
 
-    .btn-add:active {
-      opacity: 0.9;
-      transform: scale(0.99);
-      box-shadow: 0 2px 8px rgba(79,70,229,0.2);
-    }
+    .btn-add:active { opacity: 0.9; transform: scale(0.99); }
 
     /* ─── CHART ─── */
     .chart-card {
       background: var(--surface);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 22px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
     }
 
-    .chart-wrap { position: relative; height: 200px; margin-top: 10px; }
+    .chart-wrap { position: relative; height: 210px; margin-top: 12px; }
 
     /* ─── CATEGORY LIST ─── */
     .cat-list { display: flex; flex-direction: column; gap: 8px; }
 
     .cat-item {
       background: var(--surface);
-      border-radius: 14px;
-      padding: 15px 16px;
+      border-radius: 16px;
+      padding: 16px 18px;
       border: 1px solid var(--border);
       cursor: pointer;
       transition: all 0.18s cubic-bezier(.4,0,.2,1);
       box-shadow: var(--shadow-xs);
     }
 
-    .cat-item:active {
-      background: var(--primary-soft);
-      border-color: rgba(79,70,229,0.2);
-      transform: scale(0.99);
-    }
+    .cat-item:active { background: var(--primary-soft); transform: scale(0.99); }
 
-    .cat-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
+    .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .cat-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
     .cat-total { font-family: var(--serif); font-size: 16px; color: var(--red); }
     .cat-bar-bg { background: var(--surface2); border-radius: 4px; height: 4px; overflow: hidden; }
@@ -441,7 +366,7 @@
 
     .entry-item {
       background: var(--surface);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px 16px;
       display: flex;
       justify-content: space-between;
@@ -452,22 +377,25 @@
       box-shadow: var(--shadow-xs);
     }
 
-    .entry-item:active {
-      background: var(--surface2);
-      transform: scale(0.99);
+    .entry-item:active { background: var(--surface2); transform: scale(0.99); }
+
+    .entry-left { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+
+    .entry-icon {
+      width: 42px; height: 42px;
+      border-radius: 13px;
+      background: var(--primary-soft);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
     }
 
-    .entry-desc { font-size: 14px; font-weight: 500; }
+    .entry-text { overflow: hidden; }
+    .entry-desc { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .entry-meta { font-size: 11px; color: var(--sub2); margin-top: 3px; }
     .entry-amt-expense { font-family: var(--serif); font-size: 16px; color: var(--red); flex-shrink: 0; margin-left: 12px; }
 
-    .empty {
-      text-align: center;
-      color: var(--sub2);
-      padding: 40px 20px;
-      font-size: 13px;
-      font-weight: 500;
-    }
+    .empty { text-align: center; color: var(--sub2); padding: 48px 20px; font-size: 13px; font-weight: 500; }
 
     /* ─── CALENDAR ─── */
     .cal-wrap {
@@ -490,7 +418,7 @@
       text-align: center;
       font-size: 10px;
       font-weight: 700;
-      padding: 10px 0;
+      padding: 11px 0;
       color: var(--sub);
       letter-spacing: 0.06em;
     }
@@ -514,12 +442,7 @@
     .cal-cell.today { background: var(--primary-soft); }
     .cal-cell.empty { background: rgba(0,0,0,0.015); cursor: default; }
 
-    .cal-day {
-      font-size: 12px;
-      font-weight: 500;
-      margin-bottom: 3px;
-      color: var(--sub);
-    }
+    .cal-day { font-size: 12px; font-weight: 500; margin-bottom: 3px; color: var(--sub); }
 
     .cal-cell.today .cal-day {
       background: var(--primary);
@@ -534,23 +457,62 @@
     .cal-cell:nth-child(7n) .cal-day { color: #3B7DD8; }
 
     .cal-amt {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--primary);
-      background: var(--primary-soft);
-      border-radius: 4px;
-      padding: 1px 4px;
-      display: inline-block;
+      font-size: 9px; font-weight: 700;
+      color: var(--primary); background: var(--primary-soft);
+      border-radius: 4px; padding: 1px 4px; display: inline-block;
     }
 
-    /* ─── MODAL (BOTTOM SHEET) ─── */
+    /* ─── BOTTOM NAV ─── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid var(--border);
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      z-index: 100;
+      box-shadow: 0 -2px 20px rgba(79,70,229,0.07);
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-radius: 14px;
+      transition: all 0.2s cubic-bezier(.4,0,.2,1);
+    }
+
+    .nav-btn:active { transform: scale(0.92); }
+    .nav-btn.active { background: var(--primary-soft); }
+
+    .nav-icon { font-size: 22px; line-height: 1; }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--sub2);
+      font-family: var(--sans);
+      transition: color 0.2s;
+    }
+
+    .nav-btn.active .nav-label { color: var(--primary); }
+
+    /* ─── MODAL ─── */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
       background: rgba(15,23,42,0.4);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 200;
       align-items: flex-end;
     }
@@ -559,9 +521,9 @@
 
     .modal {
       background: var(--surface);
-      border-radius: 26px 26px 0 0;
+      border-radius: 28px 28px 0 0;
       border-top: 1px solid var(--border);
-      padding: 24px 20px 48px;
+      padding: 22px 20px calc(48px + env(safe-area-inset-bottom, 0px));
       width: 100%;
       max-height: 75vh;
       overflow-y: auto;
@@ -594,21 +556,18 @@
       cursor: pointer;
       color: var(--sub);
       display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s;
       flex-shrink: 0;
     }
 
-    .modal-close:active { background: var(--border); }
-
     .detail-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 13px 0;
+      padding: 14px 0;
       border-bottom: 1px solid var(--border);
     }
 
     .detail-item:last-child { border-bottom: none; }
-    .detail-desc { font-size: 14px; font-weight: 500; }
-    .detail-meta { font-size: 11px; color: var(--sub2); margin-top: 2px; }
+    .detail-desc { font-size: 14px; font-weight: 600; }
+    .detail-meta { font-size: 11px; color: var(--sub2); margin-top: 3px; }
     .detail-amt { font-family: var(--serif); font-size: 16px; color: var(--red); flex-shrink: 0; margin-left: 12px; }
 
     /* ─── EDIT MODAL ─── */
@@ -616,9 +575,9 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15,23,42,0.4);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: rgba(15,23,42,0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 300;
       align-items: center;
       justify-content: center;
@@ -629,9 +588,9 @@
 
     .edit-modal {
       background: var(--surface);
-      border-radius: 22px;
+      border-radius: 24px;
       border: 1px solid var(--border);
-      padding: 26px 22px;
+      padding: 28px 22px;
       width: 100%;
       max-width: 400px;
       animation: popIn 0.22s cubic-bezier(.34,1.4,.64,1);
@@ -650,7 +609,7 @@
       display: flex; justify-content: space-between; align-items: center;
     }
 
-    .edit-field { margin-bottom: 12px; }
+    .edit-field { margin-bottom: 14px; }
 
     .edit-field label {
       font-size: 10px;
@@ -662,14 +621,14 @@
       text-transform: uppercase;
     }
 
-    .edit-btn-row { display: flex; gap: 8px; margin-top: 20px; }
+    .edit-btn-row { display: flex; gap: 10px; margin-top: 22px; }
 
     .btn-delete {
-      flex: 1; padding: 13px;
+      flex: 1; padding: 14px;
       background: var(--red-soft);
       color: var(--red);
-      border: 1.5px solid rgba(220,53,69,0.15);
-      border-radius: 12px;
+      border: 1.5px solid rgba(239,68,68,0.12);
+      border-radius: 13px;
       font-size: 13px; font-weight: 700; font-family: var(--sans); cursor: pointer;
       transition: all 0.15s;
     }
@@ -677,10 +636,10 @@
     .btn-delete:active { opacity: 0.8; transform: scale(0.98); }
 
     .btn-save {
-      flex: 2; padding: 13px;
+      flex: 2; padding: 14px;
       background: var(--primary);
       color: #fff;
-      border: none; border-radius: 12px;
+      border: none; border-radius: 13px;
       font-size: 14px; font-weight: 700; font-family: var(--sans); cursor: pointer;
       box-shadow: 0 3px 12px rgba(79,70,229,0.28);
       transition: all 0.15s;
@@ -706,50 +665,30 @@
 
 <header>
   <div class="header-top">
-    <div class="header-left">
-      <div class="header-title">내 <span>가계부</span></div>
-    </div>
+    <div class="header-title">내 <span>가계부</span></div>
     <div class="header-year" id="yearLabel"></div>
   </div>
   <div class="month-scroll" id="monthTabs"></div>
 </header>
 
-<div class="summary">
-  <div class="card red-card">
-    <div class="card-icon">💸</div>
-    <div class="label">이번 달 지출</div>
-    <div class="amount expense-color" id="totalExpense">0원</div>
+<div class="hero-card">
+  <div class="hero-label">이번 달 지출</div>
+  <div class="hero-amount" id="totalExpense">0원</div>
+  <div class="hero-budget-row">
+    <div class="hero-budget-label">월 예산 &nbsp;<span id="totalBudget">미설정</span></div>
+    <div class="hero-budget-remain" id="remainBudget">—</div>
   </div>
-  <div class="card">
-    <div class="card-icon">🎯</div>
-    <div class="label">월 예산</div>
-    <div class="amount balance-color" id="totalBudget">미설정</div>
+  <div class="hero-bar-bg">
+    <div class="hero-bar-fill" id="budgetFill" style="width:0%"></div>
   </div>
-</div>
-
-<div class="budget-bar-wrap">
-  <div class="budget-bar-top">
-    <div class="budget-bar-label">잔여 예산</div>
-    <div class="budget-bar-remain" id="remainBudget">—</div>
-  </div>
-  <div class="budget-bg">
-    <div class="budget-fill" id="budgetFill" style="width:0%"></div>
-  </div>
-  <div class="budget-sub">
+  <div class="hero-bar-info">
     <span id="budgetUsedPct">예산을 설정해주세요</span>
     <span id="budgetUsedAmt"></span>
   </div>
-  <div class="budget-edit-row">
-    <input class="budget-input" type="number" id="budgetInput" placeholder="이번 달 예산 (원)" inputmode="numeric">
-    <button class="btn-budget" onclick="saveBudget()">설정</button>
+  <div class="hero-budget-edit">
+    <input class="hero-budget-input" type="number" id="budgetInput" placeholder="이번 달 예산 (원)" inputmode="numeric">
+    <button class="hero-btn-budget" onclick="saveBudget()">설정</button>
   </div>
-</div>
-
-<div class="view-tabs">
-  <button class="view-tab active" onclick="switchView('add')">➕ 추가</button>
-  <button class="view-tab" onclick="switchView('chart')">📊 차트</button>
-  <button class="view-tab" onclick="switchView('cal')">📅 달력</button>
-  <button class="view-tab" onclick="switchView('list')">📋 내역</button>
 </div>
 
 <div class="view-panel active" id="panel-add">
@@ -770,6 +709,7 @@
       <div class="form-row">
         <div class="field-wrap">
           <div class="field-label">내용</div>
+
           <input type="text" id="desc" placeholder="예: 스타벅스 아이스 라떼">
         </div>
       </div>
@@ -808,7 +748,7 @@
     </div>
     <div class="cal-grid" id="calGrid"></div>
   </div>
-  </div>
+</div>
 
 <div class="view-panel" id="panel-list">
   <div class="section">
@@ -862,6 +802,25 @@
     <div id="modalBody"></div>
   </div>
 </div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchView('add')">
+    <span class="nav-icon">➕</span>
+    <span class="nav-label">추가</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('chart')">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">차트</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('cal')">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">달력</span>
+  </button>
+  <button class="nav-btn" onclick="switchView('list')">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">내역</span>
+  </button>
+</nav>
 
 <div id="loadingBar"></div>
 
@@ -961,15 +920,15 @@
     const fill = document.getElementById('budgetFill');
     const remainEl = document.getElementById('remainBudget');
     if (budget > 0) {
-      remainEl.textContent = fmt(Math.max(remain, 0));
-      remainEl.style.color = remain < 0 ? 'var(--red)' : 'var(--primary)';
+      remainEl.textContent = remain < 0 ? `${fmt(-remain)} 초과` : fmt(remain);
+      remainEl.style.color = remain < 0 ? '#FCA5A5' : 'rgba(255,255,255,0.95)';
       fill.style.width = pct + '%';
-      fill.style.background = pct >= 90 ? 'var(--red)' : pct >= 70 ? '#F97316' : 'var(--primary)';
+      fill.style.background = pct >= 90 ? '#FCA5A5' : pct >= 70 ? '#FCD34D' : 'rgba(255,255,255,0.85)';
       document.getElementById('budgetUsedPct').textContent = `${pct}% 사용`;
       document.getElementById('budgetUsedAmt').textContent = remain < 0 ? `${fmt(-remain)} 초과` : `${fmt(remain)} 남음`;
     } else {
       remainEl.textContent = '—';
-      remainEl.style.color = 'var(--sub2)';
+      remainEl.style.color = 'rgba(255,255,255,0.4)';
       fill.style.width = '0%';
       document.getElementById('budgetUsedPct').textContent = '예산을 설정해주세요';
       document.getElementById('budgetUsedAmt').textContent = '';
@@ -989,7 +948,7 @@
       chartInstance = null;
       ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
       ctx.font = '500 13px Outfit, Noto Sans KR, sans-serif';
-      ctx.fillStyle = '#9CA3AF';
+      ctx.fillStyle = '#94A3B8';
       ctx.textAlign = 'center';
       ctx.fillText('지출 내역이 없어요', ctx.canvas.width/2, 100);
       return;
@@ -1015,7 +974,7 @@
             position: 'right',
             labels: {
               font: { size: 11, family: 'Outfit, Noto Sans KR, sans-serif', weight: '500' },
-              color: '#6B7280',
+              color: '#64748B',
               padding: 10,
               boxWidth: 10, boxHeight: 10,
               usePointStyle: true, pointStyle: 'circle'
@@ -1046,7 +1005,13 @@
     if (entries.length === 0) { container.innerHTML = '<div class="empty">아직 내역이 없어요</div>'; return; }
     container.innerHTML = entries.map((e,i) => ({...e, realIndex: i})).reverse().map(e => `
       <div class="entry-item" onclick="openEditModal(${e.realIndex})">
-        <div><div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub2)">[${e.category}]</span></div><div class="entry-meta">${e.date} · 탭해서 수정</div></div>
+        <div class="entry-left">
+          <div class="entry-icon">${CAT_ICONS[e.category]||'📦'}</div>
+          <div class="entry-text">
+            <div class="entry-desc">${e.desc}</div>
+            <div class="entry-meta">${e.date} · ${e.category}</div>
+          </div>
+        </div>
         <div class="entry-amt-expense">-${fmt(e.amount)}</div>
       </div>`).join('');
   }
@@ -1088,7 +1053,7 @@
   function switchView(view) {
     activeView = view;
     const views = ['add','chart','cal','list'];
-    document.querySelectorAll('.view-tab').forEach((t,i) => t.classList.toggle('active', views[i] === view));
+    document.querySelectorAll('.nav-btn').forEach((t,i) => t.classList.toggle('active', views[i] === view));
     document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-' + view).classList.add('active');
     if (view === 'chart') render();
