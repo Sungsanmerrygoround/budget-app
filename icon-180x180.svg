@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B5BD6"/>
+      <stop offset="100%" stop-color="#3730A3"/>
+    </linearGradient>
+    <linearGradient id="bar-tall" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="bar-mid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="bar-short" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.28"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="url(#bg)"/>
+
+  <!-- Subtle glow top-left -->
+  <circle cx="30" cy="28" r="60" fill="white" opacity="0.04"/>
+
+  <!-- Bar chart — bottom-aligned at y=128 -->
+  <!-- Left bar: height 58 -->
+  <rect x="36" y="70" width="30" height="58" rx="10" fill="url(#bar-mid)"/>
+  <!-- Middle bar: height 80 (tallest) -->
+  <rect x="75" y="48" width="30" height="80" rx="10" fill="url(#bar-tall)"/>
+  <!-- Right bar: height 42 -->
+  <rect x="114" y="86" width="30" height="42" rx="10" fill="url(#bar-short)"/>
+
+  <!-- Baseline -->
+  <line x1="28" y1="133" x2="152" y2="133" stroke="white" stroke-width="1.5" stroke-opacity="0.2" stroke-linecap="round"/>
+
+  <!-- ₩ badge (top right) -->
+  <circle cx="148" cy="42" r="17" fill="#FBBF24"/>
+  <circle cx="148" cy="42" r="17" fill="none" stroke="white" stroke-width="1.5" stroke-opacity="0.3"/>
+  <text x="148" y="48" font-family="'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="800" text-anchor="middle" fill="#78350F">₩</text>
+
+  <!-- Name label -->
+  <text x="90" y="157" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13.5" font-weight="500" text-anchor="middle" fill="white" opacity="0.6" letter-spacing="0.8">한준 &amp; 이현</text>
+</svg>
