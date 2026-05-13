@@ -502,15 +502,14 @@
       border-bottom: 1px solid var(--border);
       min-height: 58px;
       padding: 6px;
-      cursor: default;
+      cursor: pointer;
+      transition: background 0.15s;
     }
 
     .cal-cell:nth-child(7n) { border-right: none; }
-    .cal-cell.has-data { cursor: pointer; }
-    .cal-cell.has-data:active { background: var(--primary-soft); }
+    .cal-cell:not(.empty):active { background: var(--primary-soft); }
     .cal-cell.today { background: var(--primary-soft); }
-    .cal-cell.empty { background: rgba(0,0,0,0.015); }
-    .cal-cell.selected-day { background: var(--primary-soft); }
+    .cal-cell.empty { background: rgba(0,0,0,0.015); cursor: default; }
 
     .cal-day {
       font-size: 12px;
@@ -539,15 +538,6 @@
       border-radius: 4px;
       padding: 1px 4px;
       display: inline-block;
-    }
-
-    .day-detail { margin: 0 16px 14px; }
-
-    .day-detail-title {
-      font-family: var(--serif);
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: var(--text);
     }
 
     /* ─── MODAL (BOTTOM SHEET) ─── */
@@ -815,11 +805,7 @@
     </div>
     <div class="cal-grid" id="calGrid"></div>
   </div>
-  <div class="day-detail" id="dayDetail" style="display:none">
-    <div class="day-detail-title" id="dayDetailTitle"></div>
-    <div class="entry-list" id="dayEntryList"></div>
   </div>
-</div>
 
 <div class="view-panel" id="panel-list">
   <div class="section">
@@ -1107,7 +1093,7 @@
   }
   window.switchView = switchView;
 
-  function renderCalendar(selectedDay) {
+  function renderCalendar() {
     const entries = cachedEntries;
     const year = currentYear, month = currentMonth;
     const today = new Date();
@@ -1123,25 +1109,44 @@
       const dayEntries = dayMap[dayStr] || [];
       const total = dayEntries.reduce((s,e) => s+e.amount, 0);
       const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
-      const hasData = dayEntries.length > 0;
-      html += `<div class="cal-cell ${hasData?'has-data':''} ${isToday?'today':''} ${selectedDay===d?'selected-day':''}" onclick="${hasData?`showDayDetail(${d})`:''}">
+      html += `<div class="cal-cell ${isToday?'today':''}" onclick="showDayDetail(${d})">
         <div class="cal-day">${d}</div>${total > 0 ? `<div class="cal-amt">${(total/10000).toFixed(1)}만</div>` : ''}</div>`;
     }
     grid.innerHTML = html;
-    if (selectedDay) {
-      const dayStr = `${month+1}/${selectedDay}`;
-      const dayEntries = dayMap[dayStr] || [];
-      const total = dayEntries.reduce((s,e) => s+e.amount, 0);
-      document.getElementById('dayDetailTitle').textContent = `${month+1}월 ${selectedDay}일 · ${fmt(total)}`;
-      document.getElementById('dayEntryList').innerHTML = dayEntries.map(e => `
-        <div class="entry-item" onclick="openEditModal(${entries.indexOf(e)})">
-          <div><div class="entry-desc">${e.desc} <span style="font-size:11px;color:var(--sub2)">[${e.category}]</span></div><div class="entry-meta">${e.date} · 탭해서 수정</div></div>
-          <div class="entry-amt-expense">-${fmt(e.amount)}</div>
-        </div>`).join('');
-      document.getElementById('dayDetail').style.display = 'block';
-    } else { document.getElementById('dayDetail').style.display = 'none'; }
   }
-  window.showDayDetail = (d) => renderCalendar(d);
+
+  window.showDayDetail = function(d) {
+    const month = currentMonth, year = currentYear;
+    const dayStr = `${month+1}/${d}`;
+    const dayEntries = cachedEntries.filter(e => e.date.split(' ')[0] === dayStr);
+    const total = dayEntries.reduce((s,e) => s+e.amount, 0);
+    const dow = ['일','월','화','수','목','금','토'][new Date(year, month, d).getDay()];
+
+    document.getElementById('modalTitle').innerHTML =
+      `<span style="font-size:15px;font-family:var(--sans);font-weight:700">${month+1}월 ${d}일 (${dow})</span>&nbsp;<span style="font-family:var(--serif);font-size:17px;color:var(--red)">${total > 0 ? fmt(total) : ''}</span>`;
+
+    if (dayEntries.length === 0) {
+      document.getElementById('modalBody').innerHTML =
+        `<div class="empty" style="padding:36px 0 20px">이 날은 지출 내역이 없어요 😊</div>`;
+    } else {
+      document.getElementById('modalBody').innerHTML = dayEntries.map(e => {
+        const realIndex = cachedEntries.indexOf(e);
+        return `<div class="detail-item" onclick="openEditFromDay(${realIndex})" style="cursor:pointer">
+          <div>
+            <div class="detail-desc">${e.desc} <span style="font-size:11px;color:var(--sub2)">[${e.category}]</span></div>
+            <div class="detail-meta">${e.date} · 탭해서 수정</div>
+          </div>
+          <div class="detail-amt">-${fmt(e.amount)}</div>
+        </div>`;
+      }).join('');
+    }
+    document.getElementById('modalOverlay').classList.add('open');
+  };
+
+  window.openEditFromDay = function(index) {
+    closeModalDirect();
+    setTimeout(() => openEditModal(index), 180);
+  };
 
   function openModal(cat) {
     const entries = cachedEntries.filter(e => e.category === cat);
