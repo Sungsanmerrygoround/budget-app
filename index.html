@@ -114,6 +114,18 @@
       box-shadow: 0 3px 12px rgba(79,70,229,0.35);
     }
 
+    .month-year-sep {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--sub2);
+      letter-spacing: 0.08em;
+      padding: 0 4px 0 8px;
+      white-space: nowrap;
+    }
+
     /* ─── HERO CARD ─── */
     .hero-card {
       margin: 0 16px 16px;
@@ -897,13 +909,27 @@
     const container = document.getElementById('monthTabs');
     document.getElementById('yearLabel').textContent = currentYear + '년';
     container.innerHTML = '';
-    MONTHS.forEach((m, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'month-tab' + (i === currentMonth ? ' active' : '');
-      btn.textContent = m;
-      btn.onclick = () => { currentMonth = i; buildMonthTabs(); loadData(); };
-      container.appendChild(btn);
-    });
+    const START_YEAR = 2026, START_MONTH = 4;
+    const END_YEAR = 2027, END_MONTH = 11;
+    let prevYear = null;
+    for (let y = START_YEAR; y <= END_YEAR; y++) {
+      const mStart = (y === START_YEAR) ? START_MONTH : 0;
+      const mEnd   = (y === END_YEAR)   ? END_MONTH   : 11;
+      for (let m = mStart; m <= mEnd; m++) {
+        if (y !== prevYear) {
+          const sep = document.createElement('div');
+          sep.className = 'month-year-sep';
+          sep.textContent = y + '년';
+          container.appendChild(sep);
+          prevYear = y;
+        }
+        const btn = document.createElement('button');
+        btn.className = 'month-tab' + (y === currentYear && m === currentMonth ? ' active' : '');
+        btn.textContent = MONTHS[m];
+        btn.onclick = () => { currentYear = y; currentMonth = m; buildMonthTabs(); loadData(); };
+        container.appendChild(btn);
+      }
+    }
     setTimeout(() => {
       const active = container.querySelector('.active');
       if (active) active.scrollIntoView({ inline: 'center', behavior: 'smooth' });
